@@ -1,12 +1,16 @@
       const words = [
         "engineer.",
-        "builder.",
+        "developer.",
         "pilot.",
+        "solver.",
         "pianist.",
         "climber."
       ];
 
       const typedWord = document.getElementById("typed-word");
+    //   if (!typedWord) {
+    //     return;
+    //   }
 
       let wordIndex = 0;
       let letterIndex = 0;

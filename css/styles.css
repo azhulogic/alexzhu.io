@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 body {
   place-items: center;
   font-family: "Lato", sans-serif;
@@ -14,7 +18,10 @@ body {
 }
 
 .home-page h1 {
+  display: inline-block;
   margin-bottom: 0.25rem;
+  line-height: 1;
+  view-transition-name: alex-zhu-title;
 }
 
 .home-page p {
@@ -57,7 +64,10 @@ a:hover {
 }
 
 .site-title {
+  display: inline-block;
   font-weight: 700;
+  line-height: 1;
+  view-transition-name: alex-zhu-title;
 }
 
 .site-nav {
@@ -102,6 +112,23 @@ p {
   font-size: clamp(1.25rem, 2.75vw, 1.75rem);
   margin-left: -0.2em;
   animation: blink 1s infinite;
+}
+
+::view-transition-group(alex-zhu-title) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(alex-zhu-title),
+::view-transition-new(alex-zhu-title) {
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(alex-zhu-title) {
+    animation-duration: 1ms;
+  }
 }
 
 @keyframes blink {
