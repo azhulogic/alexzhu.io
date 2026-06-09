@@ -10,7 +10,6 @@ const entries = (await getCollection("photos"))
 
 <BaseLayout title="Photos | alexzhu.io" canonicalPath="/photos/">
   <main class="page-content">
-    <h1>Photos</h1>
     <EntryList entries={entries} basePath="/photos" emptyText="Nothing here... yet." />
   </main>
 </BaseLayout>
