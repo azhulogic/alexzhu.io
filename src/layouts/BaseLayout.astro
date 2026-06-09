@@ -1,36 +1,50 @@
+---
+type Props = {
+  title?: string;
+  bodyClass?: string;
+  canonicalPath?: string;
+  showTitle?: boolean;
+};
+
+const {
+  title = "alexzhu.io",
+  bodyClass = "subpage",
+  canonicalPath = "/",
+  showTitle = true
+} = Astro.props;
+
+const canonicalUrl = new URL(canonicalPath, Astro.site ?? "https://alexzhu.io").toString();
+---
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="upgrade-insecure-requests">
-    <title>Photos | alexzhu.io</title>
-    <link rel="canonical" href="https://alexzhu.io/photos.html">
+    <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl}>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="js/main.js" defer></script>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/main.js" defer></script>
   </head>
 
-  <body class="subpage">
+  <body class={bodyClass}>
     <header class="site-header">
-      <a class="site-title" href="index.html">Alex Zhu</a>
+      {showTitle && <a class="site-title" href="/">Alex Zhu</a>}
 
       <nav class="site-nav" aria-label="Main navigation">
-        <a href="about.html">About</a>
-        <a href="projects.html">Projects</a>
-        <a href="photos.html">Photos</a>
+        <a href="/about/">About</a>
+        <a href="/projects/">Projects</a>
+        <a href="/photos/">Photos</a>
       </nav>
     </header>
 
-    <main class="page-content">
-      <p>
-        Nothing here... yet.
-      </p>
-    </main>
+    <slot />
 
     <footer class="site-footer">
       <a href="https://www.linkedin.com/in/alex-zhu-12a580155/">LinkedIn</a>
