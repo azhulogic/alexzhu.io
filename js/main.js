@@ -4,6 +4,7 @@
         "pilot.",
         "solver.",
         "pianist.",
+        "traveler.",
         "climber."
       ];
 

@@ -24,7 +24,7 @@ body {
   view-transition-name: alex-zhu-title;
 }
 
-.home-page p {
+.tagline {
   margin-top: 0;
   margin-bottom: 3rem;
   font-size: clamp(1.25rem, 3vw, 1.75rem);
@@ -53,6 +53,13 @@ a:hover {
 .site-footer {
     color: #444;
     font-size: small;
+    text-align: center;
+}
+
+.copyright {
+  margin: .2rem;
+  font-size: x-small;
+  color: #777;
 }
 
 .site-header {
@@ -81,17 +88,6 @@ a:hover {
 
 .site-nav a:hover {
   color: #111;
-}
-
-.home {
-  display: grid;
-  place-items: center;
-  padding: 2rem;
-}
-
-.home section {
-  max-width: 42rem;
-  width: 100%;
 }
 
 h1 {
