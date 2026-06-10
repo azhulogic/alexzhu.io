@@ -1,9 +1,10 @@
 ---
 type Entry = {
-  slug: string;
+  id: string;
   data: {
     title: string;
     date: Date;
+    displayDate?: string;
     summary?: string;
     tags?: string[];
   };
@@ -16,6 +17,13 @@ type Props = {
 };
 
 const { entries, basePath, emptyText } = Astro.props;
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC"
+});
 ---
 
 {
@@ -23,14 +31,10 @@ const { entries, basePath, emptyText } = Astro.props;
     <ol class="entry-list">
       {entries.map((entry) => (
         <li>
-          <a href={`${basePath}/${entry.slug}/`}>
+          <a href={`${basePath}/${entry.id}/`}>
             <span>{entry.data.title}</span>
             <time datetime={entry.data.date.toISOString()}>
-              {entry.data.date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric"
-              })}
+              {entry.data.displayDate ?? dateFormatter.format(entry.data.date)}
             </time>
           </a>
           {entry.data.summary && <p>{entry.data.summary}</p>}

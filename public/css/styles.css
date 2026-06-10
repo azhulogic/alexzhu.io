@@ -156,6 +156,26 @@ a:focus-visible {
   font-size: 1.125rem;
 }
 
+.entry-content img {
+  width: min(100%, 38rem);
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 4px;
+}
+
+.entry-content img.photo-small {
+  width: min(100%, 24rem);
+}
+
+.entry-content img.photo-medium {
+  width: min(100%, 38rem);
+}
+
+.entry-content img.photo-wide {
+  width: min(100%, 52rem);
+}
+
 .demo-placeholder {
   margin: 1.5rem 0;
 }
