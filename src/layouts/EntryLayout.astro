@@ -4,11 +4,19 @@ import BaseLayout from "./BaseLayout.astro";
 type Props = {
   title: string;
   date: Date;
+  displayDate?: string;
   summary?: string;
   collectionPath: string;
 };
 
-const { title, date, summary, collectionPath } = Astro.props;
+const { title, date, displayDate, summary, collectionPath } = Astro.props;
+
+// const dateFormatter = new Intl.DateTimeFormat("en-US", {
+//   year: "numeric",
+//   month: "short",
+//   day: "numeric",
+//   timeZone: "UTC"
+// });
 ---
 
 <BaseLayout title={`${title} | alexzhu.io`} canonicalPath={collectionPath}>
@@ -18,13 +26,10 @@ const { title, date, summary, collectionPath } = Astro.props;
         {collectionPath.startsWith("/projects") ? "Projects" : "Photos"}
       </a>
       <span> / </span>
-      <time datetime={date.toISOString()}>{date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      })}</time>
+      {title}
+      <span> / </span>
+      {displayDate}
     </p>
-    <h1>{title}</h1>
     {summary && <p class="entry-summary">{summary}</p>}
     <slot />
   </main>

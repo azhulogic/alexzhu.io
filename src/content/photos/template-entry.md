@@ -1,10 +1,18 @@
 ---
 title: "Example Photo Entry"
 date: 2026-06-09
+displayDate: "Spring 2026"
 summary: "A draft placeholder showing the future photo-entry shape."
 tags: ["photos"]
 draft: true
 ---
 
-Photo entries can use ordinary Markdown now, and can grow into MDX later if a
-photo essay needs custom components.
+This is a text block
+
+## Caption
+
+<img
+  src="/assets/photos/X/X.jpg"
+  alt="tags"
+  class="photo-small"
+/>
