@@ -1,7 +1,7 @@
 ---
 title: "China"
 date: 2026-06-09
-displayDate: "Spring 2026"
+primaryTag: "Spring 2026"
 summary: ""
 tags: ["travel", "china", "photos"]
 draft: false

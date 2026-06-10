@@ -5,7 +5,7 @@ import { z } from "astro/zod";
 const entrySchema = z.object({
   title: z.string(),
   date: z.date(),
-  displayDate: z.string().optional(),
+  primaryTag: z.string().optional(),
   summary: z.string().optional(),
   tags: z.array(z.string()).default([]),
   draft: z.boolean().default(false),

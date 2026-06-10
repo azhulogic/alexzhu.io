@@ -188,6 +188,36 @@ a:focus-visible {
   background: #fff;
 }
 
+.pendulum-demo {
+  margin: 1.5rem 0;
+}
+
+.pendulum-demo canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.pendulum-demo button {
+  display: block;
+  margin: 0.75rem auto 0;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pendulum-demo button:hover,
+.pendulum-demo button:focus-visible {
+  border-color: var(--text);
+}
+
 .site-footer {
   width: 100%;
   margin-top: auto;

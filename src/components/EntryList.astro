@@ -4,7 +4,7 @@ type Entry = {
   data: {
     title: string;
     date: Date;
-    displayDate?: string;
+    primaryTag?: string;
     summary?: string;
     tags?: string[];
   };
@@ -34,10 +34,9 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
           <a href={`${basePath}/${entry.id}/`}>
             <span>{entry.data.title}</span>
             <time datetime={entry.data.date.toISOString()}>
-              {entry.data.displayDate ?? dateFormatter.format(entry.data.date)}
+              {entry.data.primaryTag ?? dateFormatter.format(entry.data.date)}
             </time>
           </a>
-          {entry.data.summary && <p>{entry.data.summary}</p>}
         </li>
       ))}
     </ol>

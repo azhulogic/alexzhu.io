@@ -4,12 +4,12 @@ import BaseLayout from "./BaseLayout.astro";
 type Props = {
   title: string;
   date: Date;
-  displayDate?: string;
+  primaryTag?: string;
   summary?: string;
   collectionPath: string;
 };
 
-const { title, date, displayDate, summary, collectionPath } = Astro.props;
+const { title, date, primaryTag, summary, collectionPath } = Astro.props;
 
 // const dateFormatter = new Intl.DateTimeFormat("en-US", {
 //   year: "numeric",
@@ -28,7 +28,7 @@ const { title, date, displayDate, summary, collectionPath } = Astro.props;
       <span> / </span>
       {title}
       <span> / </span>
-      {displayDate}
+      {primaryTag}
     </p>
     {summary && <p class="entry-summary">{summary}</p>}
     <slot />

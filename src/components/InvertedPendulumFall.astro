@@ -1,0 +1,106 @@
+<div class="pendulum-demo">
+  <canvas
+    width="720"
+    height="420"
+    aria-label="Animation of an inverted pendulum falling under gravity"
+  ></canvas>
+  <button type="button">Reset</button>
+</div>
+
+<script>
+  const demos = document.querySelectorAll(".pendulum-demo");
+
+  demos.forEach((demo) => {
+    const canvas = demo.querySelector("canvas");
+    const button = demo.querySelector("button");
+
+    if (!(canvas instanceof HTMLCanvasElement) || !(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      return;
+    }
+
+    const state = {
+      theta: 0.16,
+      omega: 0,
+      lastTime: 0
+    };
+
+    const length = 180;
+    const gravity = 9.81;
+    const damping = 0.05;
+    const timeScale = 1.25;
+
+    function reset() {
+      state.theta = 0.16;
+      state.omega = 0;
+      state.lastTime = 0;
+    }
+
+    function step(dt) {
+      const alpha = (gravity / (length / 100)) * Math.sin(state.theta);
+      state.omega += alpha * dt;
+      state.omega *= 1 - damping * dt;
+      state.theta += state.omega * dt;
+    }
+
+    function draw() {
+      const width = canvas.width;
+      const height = canvas.height;
+      const pivotX = width / 2;
+      const pivotY = height - 70;
+      const bobX = pivotX + length * Math.sin(state.theta);
+      const bobY = pivotY - length * Math.cos(state.theta);
+
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.fillStyle = "#fafafa";
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.strokeStyle = "#d9d9d9";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(80, pivotY);
+      ctx.lineTo(width - 80, pivotY);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#111";
+      ctx.lineWidth = 8;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(bobX, bobY);
+      ctx.stroke();
+
+      ctx.fillStyle = "#111";
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#444";
+      ctx.beginPath();
+      ctx.arc(bobX, bobY, 16, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function animate(now) {
+      if (state.lastTime === 0) {
+        state.lastTime = now;
+      }
+
+      const dt = Math.min((now - state.lastTime) / 1000, 0.033) * timeScale;
+      state.lastTime = now;
+
+      step(dt);
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    button.addEventListener("click", reset);
+    requestAnimationFrame(animate);
+  });
+</script>
