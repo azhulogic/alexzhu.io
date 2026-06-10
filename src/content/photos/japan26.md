@@ -1,6 +1,6 @@
 ---
 title: "Japan"
-date: 2026-06-01
+date: 2026-03-01
 primaryTag: "Spring 2026"
 summary: ""
 tags: ["travel", "japan", "photos"]
