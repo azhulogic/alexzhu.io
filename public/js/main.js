@@ -49,3 +49,15 @@ if (typedWord) {
 
   typeLoop();
 }
+
+document.querySelectorAll("video[data-volume]").forEach((video) => {
+  if (!(video instanceof HTMLVideoElement)) {
+    return;
+  }
+
+  const volume = Number(video.dataset.volume);
+
+  if (Number.isFinite(volume)) {
+    video.volume = Math.min(Math.max(volume, 0), 1);
+  }
+});
