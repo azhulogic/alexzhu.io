@@ -1,0 +1,15 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryList from "../../components/EntryList.astro";
+
+const entries = (await getCollection("music"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Music | alexzhu.io" canonicalPath="/music/">
+  <main class="page-content">
+    <EntryList entries={entries} basePath="/music" emptyText="Nothing here... yet." />
+  </main>
+</BaseLayout>

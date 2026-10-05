@@ -22,4 +22,9 @@ const photos = defineCollection({
   schema: entrySchema
 });
 
-export const collections = { projects, photos };
+const music = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/music" }),
+  schema: entrySchema
+});
+
+export const collections = { projects, photos, music };
