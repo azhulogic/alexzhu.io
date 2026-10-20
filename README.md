@@ -23,3 +23,16 @@ Settings > Environments > github-pages, allow deployments from both `main` and
 `dev` if deployment branch restrictions are enabled. The workflow must be
 present on both branches so production deployments also retain the preview.
 No DNS changes or external hosting account are required.
+
+## Logbook data
+
+`src/data/logbook.json` is a read-only snapshot imported from the pilot logbook,
+not a live Google Sheets connection. Only complete flight rows contribute to
+totals; page subtotals and cumulative totals are excluded to avoid double counting.
+The imported totals are checked against the sheet's final totals by `npm test`.
+
+The owner confirmed a first flight in 2021 and chronological entry order.
+Month/day dates are assigned years from that starting point, advancing the year
+each time the month/day moves backward. The owner confirmed no flights in 2025;
+`yearOverrides` anchors the May 30 entry at source row 86 to 2026. Aircraft variants
+are grouped by type and displayed as Cessna 150, Cessna 172, and Piper Archer.

@@ -1,0 +1,249 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import logbook from "../data/logbook.json";
+import { aircraftName, aircraftType, inferFlightDates, logbookColumns, summarizeFlights } from "../lib/logbook.mjs";
+
+const flights = inferFlightDates(logbook.entries, logbook.firstFlightYear, logbook.yearOverrides);
+const totals = summarizeFlights(flights);
+const hours = (value: number) => value.toFixed(1);
+const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+const dateLabel = (date: string) => dateFormat.format(new Date(`${date}T00:00:00Z`));
+const fleet = [
+  { type: "C150", name: "Cessna 150", code: "C150" },
+  { type: "C172", name: "Cessna 172", code: "C172" },
+  { type: "PA28", name: "Piper Archer", code: "PA-28" }
+].map((aircraft) => ({ ...aircraft, recorded: totals.aircraft.find((item) => item.type === aircraft.type) }));
+for (const aircraft of totals.aircraft) {
+  if (!fleet.some((item) => item.type === aircraft.type)) {
+    fleet.push({ type: aircraft.type, name: aircraft.type, code: aircraft.type, recorded: aircraft });
+  }
+}
+const firstYear = Number(flights[0].date.slice(0, 4));
+const lastYear = Number(flights.at(-1)!.date.slice(0, 4));
+const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => String(firstYear + index));
+const annual = years.map((year) => ({ year, ...summarizeFlights(flights.filter((flight) => flight.date.startsWith(year))) }));
+let cumulativeTenths = 0;
+const cumulative = flights.map((flight) => {
+  cumulativeTenths += Math.round(flight.hours * 10);
+  return { ...flight, cumulative: cumulativeTenths / 10 };
+});
+const firstTime = new Date(`${flights[0].date}T00:00:00Z`).valueOf();
+const lastTime = new Date(`${flights.at(-1)!.date}T00:00:00Z`).valueOf();
+const maxY = Math.ceil(totals.hours / 20) * 20 || 20;
+const chartX = (date: string) => 42 + ((new Date(`${date}T00:00:00Z`).valueOf() - firstTime) / Math.max(1, lastTime - firstTime)) * 656;
+const chartY = (value: number) => 172 - (value / maxY) * 148;
+let previousHours = 0;
+const linePath = `M42,172 ${cumulative.map((flight) => {
+  const segment = `L${chartX(flight.date)},${chartY(previousHours)} L${chartX(flight.date)},${chartY(flight.cumulative)}`;
+  previousHours = flight.cumulative;
+  return segment;
+}).join(" ")}`;
+const areaPath = `${linePath} L698,172 Z`;
+const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ key }) => flight[key as keyof typeof flight]);
+---
+
+<BaseLayout title="Logbook | alexzhu.io" canonicalPath="/logbook/">
+  <main class="page-content logbook-page">
+    <header class="logbook-header">
+      <p class="eyebrow">Flying since {logbook.firstFlightYear}</p>
+      <h1>Logbook</h1>
+      <p class="intro">A little perspective on time in the air.</p>
+    </header>
+
+    <section class="flight-summary" aria-label="Flight totals">
+      <div class="total-hours">
+        <span class="stat-label">Total flight time</span>
+        <div class="hero-value">{hours(totals.hours)}<span>hrs</span></div>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">TOFLs</span>
+        <strong>{totals.landings}</strong>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Flights</span>
+        <strong>{totals.flights}</strong>
+      </div>
+    </section>
+
+
+    <section class="hours-section" aria-labelledby="hours-title">
+      <div class="section-heading">
+        <h2 id="hours-title">Hours over time</h2>
+        <span>{years[0]}–{years.at(-1)}</span>
+      </div>
+      <svg class="hours-chart" viewBox="0 0 724 204" role="img" aria-labelledby="chart-title chart-description">
+        <title id="chart-title">Cumulative logged flight hours</title>
+        <desc id="chart-description">{totals.flights} flights from {dateLabel(flights[0].date)} to {dateLabel(flights.at(-1)!.date)}, accumulating {hours(totals.hours)} hours.</desc>
+        {[0, maxY / 2, maxY].map((tick) => (
+          <g>
+            <line class="grid-line" x1="42" x2="698" y1={chartY(tick)} y2={chartY(tick)} />
+            <text class="axis-label" x="30" y={chartY(tick) + 4} text-anchor="end">{tick}</text>
+          </g>
+        ))}
+        <path class="chart-area" d={areaPath} />
+        <path class="chart-line" d={linePath} />
+        {cumulative.map((flight) => (
+          <circle class="chart-point" cx={chartX(flight.date)} cy={chartY(flight.cumulative)} r="5" tabindex="0">
+            <title>{dateLabel(flight.date)} · {hours(flight.hours)} h flight · {hours(flight.cumulative)} h total</title>
+          </circle>
+        ))}
+        <circle class="chart-end" cx="698" cy={chartY(totals.hours)} r="4" />
+        <text class="chart-total" x="698" y={chartY(totals.hours) - 12} text-anchor="end">{hours(totals.hours)} h</text>
+        {years.map((year, index) => (
+          <text class="axis-label" x={index === 0 ? 42 : chartX(`${year}-01-01`)} y="199">{year}</text>
+        ))}
+      </svg>
+      <div class="annual-totals" aria-label="Flight hours by year">
+        {annual.map((year) => <div><span>{year.year}</span><strong>{hours(year.hours)}<small> h</small></strong></div>)}
+      </div>
+    </section>
+
+    <section class="aircraft-section" aria-labelledby="aircraft-title">
+      <div class="section-heading"><h2 id="aircraft-title">Time in type</h2><span>Flight hours</span></div>
+      <div class="aircraft-list">
+        {fleet.map((aircraft) => (
+          <div class:list={["aircraft-row", { pending: !aircraft.recorded }]}>
+            <div class="aircraft-name"><strong>{aircraft.name}</strong><span>{aircraft.code}</span></div>
+            <div class="aircraft-distribution">
+              <div class="aircraft-track" aria-hidden="true"><div style={`width: ${aircraft.recorded ? (aircraft.recorded.hours / totals.hours) * 100 : 0}%`}></div></div>
+              <span>{aircraft.recorded ? `${aircraft.recorded.flights} flights · ${Math.round((aircraft.recorded.hours / totals.hours) * 100)}% of logged time` : "Records to come"}</span>
+            </div>
+            <strong class="aircraft-hours">{aircraft.recorded ? hours(aircraft.recorded.hours) : "—"}<small>{aircraft.recorded && " h"}</small></strong>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="flight-records" class="records-section" aria-labelledby="records-title">
+      <div class="section-heading"><h2 id="records-title">Flight records</h2><span id="record-count" aria-live="polite">{flights.length} entries</span></div>
+      <div class="table-controls">
+        <label class="search-label"><span class="sr-only">Search flight records</span><input id="flight-search" type="search" placeholder="Search aircraft, airport, or date…" /></label>
+        <label class="aircraft-filter"><span class="sr-only">Filter by aircraft type</span><select id="aircraft-filter"><option value="">All aircraft</option>{totals.aircraft.map((aircraft) => <option value={aircraft.type}>{fleet.find((item) => item.type === aircraft.type)?.name ?? aircraft.type}</option>)}</select></label>
+      </div>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Flight logbook; scroll horizontally for all columns">
+        <table id="flight-table">
+          <caption class="sr-only">Imported flight entries with totals. Times are decimal hours; landing columns are counts.</caption>
+          <thead><tr>
+            <th scope="col">Date</th><th scope="col">Aircraft</th><th scope="col">Tail</th><th scope="col">From</th><th scope="col">To / route</th>
+            {logbookColumns.map((column) => <th scope="col" class="numeric" title={column.unit === "hours" ? `${column.label}, decimal hours` : `${column.label}, count`}>{column.label}</th>)}
+          </tr></thead>
+          <tbody>
+            {flights.map((flight) => (
+              <tr data-search={`${dateLabel(flight.date)} ${flight.date} ${aircraftName(flight.model)} ${flight.tail} ${flight.from} ${flight.to}`.toLowerCase()} data-aircraft={aircraftType(flight.model)} data-values={JSON.stringify(tableValues(flight))}>
+                <th scope="row"><time datetime={flight.date}>{dateLabel(flight.date)}</time></th>
+                <td>{aircraftName(flight.model)}</td><td>{flight.tail}</td><td>{flight.from}</td><td>{flight.to}</td>
+                {logbookColumns.map((column) => {
+                  const value = Number(flight[column.key as keyof typeof flight]);
+                  return <td class="numeric">{value === 0 ? <span class="zero">—</span> : column.unit === "count" ? value : hours(value)}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot><tr><th scope="row" colspan="5" id="totals-label">Total · {flights.length} flights</th>{logbookColumns.map((column) => <td class="numeric" data-total={column.key}>{column.unit === "count" ? totals[column.key as keyof typeof totals] : hours(Number(totals[column.key as keyof typeof totals]))}</td>)}</tr></tfoot>
+        </table>
+      </div>
+      <p id="no-flights" hidden>No flights match your search.</p>
+      <div class="record-notes">
+        <p>PIC = pilot in command; XC = cross-country; LDG = landings.</p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  import { logbookColumns } from "../lib/logbook.mjs";
+  const search = document.querySelector<HTMLInputElement>("#flight-search")!;
+  const filter = document.querySelector<HTMLSelectElement>("#aircraft-filter")!;
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>("#flight-table tbody tr")];
+  const footer = [...document.querySelectorAll<HTMLTableCellElement>("#flight-table [data-total]")];
+  function updateTable() {
+    const query = search.value.trim().toLowerCase();
+    const sums = logbookColumns.map(() => 0);
+    let count = 0;
+    for (const row of rows) {
+      const matches = (row.dataset.search ?? "").includes(query) && (!filter.value || row.dataset.aircraft === filter.value);
+      row.hidden = !matches;
+      if (matches) {
+        count += 1;
+        const values: number[] = JSON.parse(row.dataset.values!);
+        values.forEach((value, index) => { sums[index] += Math.round(value * 10); });
+      }
+    }
+    footer.forEach((cell, index) => { cell.textContent = logbookColumns[index].unit === "count" ? String(sums[index] / 10) : (sums[index] / 10).toFixed(1); });
+    document.querySelector("#record-count")!.textContent = `${count} of ${rows.length} entries`;
+    document.querySelector("#totals-label")!.textContent = `${query || filter.value ? "Filtered total" : "Total"} · ${count} flights`;
+    document.querySelector<HTMLElement>("#no-flights")!.hidden = count !== 0;
+  }
+  search.addEventListener("input", updateTable);
+  filter.addEventListener("change", updateTable);
+</script>
+
+<style>
+  .logbook-page { --ink-accent: #365b65; width: min(100%, 62rem); margin-top: 2.5rem; margin-bottom: 4rem; }
+  .logbook-header { margin-bottom: 2rem; }
+  .logbook-header .eyebrow { color: var(--soft); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.8rem; }
+  .logbook-header h1 { font-size: clamp(2.25rem, 7vw, 3.25rem); letter-spacing: -0.045em; margin: 0 0 0.5rem; }
+  .logbook-header .intro { color: var(--soft); font-size: 1rem; }
+  .flight-summary { display: grid; grid-template-columns: 1.5fr 1fr 1fr; align-items: center; gap: 2rem; padding: 2rem 0; border-block: 1px solid #dedede; }
+  .stat-label { display: block; font-size: 0.8rem; color: var(--muted); }
+  .hero-value { font-size: clamp(3.5rem, 9vw, 5rem); letter-spacing: -0.055em; line-height: 1.2; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hero-value span { font-size: 1rem; margin-left: 0.6rem; font-weight: 400; letter-spacing: 0; color: var(--soft); }
+  .stat-detail { display: block; color: var(--soft); font-size: 0.75rem; line-height: 1.5; }
+  .summary-stat strong { display: block; margin: 0.5rem 0; font-size: 2.25rem; letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
+  .hours-section, .aircraft-section, .records-section { margin-top: 3.25rem; }
+  .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 1.25rem; }
+  .section-heading h2 { margin: 0; font-size: 1.125rem; letter-spacing: -0.02em; }
+  .section-heading > span { color: var(--soft); font-size: 0.75rem; white-space: nowrap; }
+  .hours-chart { display: block; width: 100%; height: auto; overflow: visible; }
+  .grid-line { stroke: #e4e6e6; stroke-width: 1; stroke-dasharray: 3 5; }
+  .axis-label { fill: #777; font-size: 10px; }
+  .chart-area { fill: var(--ink-accent); opacity: 0.065; }
+  .chart-line { fill: none; stroke: var(--ink-accent); stroke-width: 2; stroke-linejoin: round; }
+  .chart-point { fill: transparent; }
+  .chart-point:hover, .chart-point:focus { fill: var(--ink-accent); outline: none; }
+  .chart-end { fill: var(--ink-accent); }
+  .chart-total { fill: var(--ink-accent); font-size: 11px; font-weight: 700; }
+  .annual-totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-left: 0.5rem; }
+  .annual-totals > div { padding-left: 0.75rem; border-left: 2px solid #e1e6e7; }
+  .annual-totals span { display: block; color: var(--soft); font-size: 0.7rem; margin-bottom: 0.35rem; }
+  .annual-totals strong { font-size: 1.125rem; font-variant-numeric: tabular-nums; }
+  .annual-totals small { color: var(--soft); font-size: 0.75rem; font-weight: 400; }
+  .aircraft-row { display: grid; grid-template-columns: 8.5rem 1fr 4.5rem; gap: 1.5rem; align-items: center; border-top: 1px solid #e6e6e6; padding: 1.2rem 0; }
+  .aircraft-name strong { display: block; font-size: 0.9rem; }
+  .aircraft-name span { display: block; margin-top: 0.3rem; color: var(--soft); font-size: 0.7rem; }
+  .aircraft-track { height: 5px; background: #e4e9ea; border-radius: 3px; overflow: hidden; margin-bottom: 0.6rem; }
+  .aircraft-track > div { height: 100%; background: var(--ink-accent); border-radius: 3px; }
+  .aircraft-distribution > span { font-size: 0.7rem; color: var(--soft); }
+  .aircraft-hours { text-align: right; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  .aircraft-hours small { font-size: 0.75rem; font-weight: 400; color: var(--soft); }
+  .pending .aircraft-track { background: none; border-bottom: 1px dashed #d9dfe0; border-radius: 0; }
+  .pending .aircraft-name strong, .pending .aircraft-hours { color: var(--soft); font-weight: 400; }
+  .table-controls { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .search-label { flex: 1; }
+  .table-controls input, .table-controls select { width: 100%; border: 1px solid #dedede; background: transparent; color: var(--text); border-radius: 4px; font: inherit; font-size: 0.8rem; padding: 0.65rem 0.8rem; min-height: 2.5rem; }
+  .table-controls input:focus-visible, .table-controls select:focus-visible, .table-scroll:focus-visible { outline: 2px solid var(--ink-accent); outline-offset: 3px; }
+  .table-scroll { overflow: auto; max-height: 32rem; border: 1px solid #dedede; border-radius: 4px; }
+  table { width: 100%; border-spacing: 0; font-size: 0.72rem; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: left; }
+  th, td { padding: 0.7rem 0.8rem; border-bottom: 1px solid #e8e8e8; border-right: 1px solid #ededed; }
+  thead th { position: sticky; top: 0; z-index: 2; background: #eef1f1; color: #4b595c; font-weight: 700; }
+  tbody th { position: sticky; left: 0; z-index: 1; background: var(--page-bg); font-weight: 400; }
+  tbody tr:nth-child(even) td, tbody tr:nth-child(even) th { background: #f3f5f5; }
+  tbody tr:hover td, tbody tr:hover th { background: #eaf0f1; }
+  thead th:first-child { left: 0; z-index: 3; }
+  tfoot th, tfoot td { position: sticky; bottom: 0; z-index: 2; background: #e7edee; border-bottom: 0; font-weight: 700; }
+  tfoot th { left: 0; z-index: 3; }
+  .numeric { text-align: right; }
+  .zero { color: #a1a7a8; }
+  .record-notes { margin-top: 1rem; }
+  .record-notes p { color: var(--soft); font-size: 0.7rem; line-height: 1.6; margin: 0.3rem 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  @media (max-width: 40rem) {
+    .flight-summary { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .total-hours { grid-column: 1 / -1; }
+    .summary-stat strong { font-size: 2rem; }
+    .aircraft-row { grid-template-columns: 6.5rem 1fr 3.25rem; gap: 0.8rem; }
+    .aircraft-name strong { font-size: 0.8rem; }
+    .table-controls { flex-direction: column; }
+    .logbook-page { margin-top: 1.5rem; }
+  }
+</style>
