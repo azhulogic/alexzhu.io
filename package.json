@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:preview": "node scripts/build-preview.mjs",
+    "test": "node --test scripts/build-preview.test.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.0",
     "astro": "^6.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "parse5": "^7.3.0"
+  }
 }
