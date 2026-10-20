@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryList from "../../components/EntryList.astro";
+import TravelGlobe from "../../components/TravelGlobe.astro";
+
+const entries = (await getCollection("photos"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Travel | alexzhu.io" canonicalPath="/travel/">
+  <main class="page-content">
+    <TravelGlobe />
+    <section class="trips-section" aria-labelledby="trips-title">
+      <h2 id="trips-title">Trips</h2>
+      <div class="trip-list-indent">
+        <EntryList entries={entries} basePath="/travel" emptyText="Nothing here... yet." />
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .trip-list-indent {
+    padding-inline-start: 1.25rem;
+  }
+
+  #trips-title {
+    margin: 3rem 0 0.75rem;
+    font-size: 1.375rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+</style>

@@ -4,7 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import EntryList from "../../components/EntryList.astro";
 
 const entries = (await getCollection("projects"))
-  .filter((entry) => !entry.data.draft)
+  .filter((entry) => !entry.data.draft || import.meta.env.SHOW_PROJECT_DRAFTS === "true")
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 

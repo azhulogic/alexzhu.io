@@ -3,7 +3,9 @@ import { getCollection, render } from "astro:content";
 import EntryLayout from "../../layouts/EntryLayout.astro";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("projects", ({ data }) => !data.draft);
+  const entries = await getCollection("projects", ({ data }) =>
+    !data.draft || import.meta.env.SHOW_PROJECT_DRAFTS === "true"
+  );
   return entries.map((entry) => ({
     params: { slug: entry.id },
     props: { entry }
