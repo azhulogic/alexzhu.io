@@ -11,7 +11,7 @@ type Props = {
 
 const { title, date, primaryTag, summary, collectionPath } = Astro.props;
 const collection = collectionPath.split("/")[1];
-const collectionLabel = { projects: "Projects", photos: "Photos", music: "Music" }[collection];
+const collectionLabel = { projects: "Projects", travel: "Travel", music: "Music" }[collection];
 
 // const dateFormatter = new Intl.DateTimeFormat("en-US", {
 //   year: "numeric",

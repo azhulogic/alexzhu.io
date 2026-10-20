@@ -7,12 +7,13 @@ type Entry = {
     primaryTag?: string;
     summary?: string;
     tags?: string[];
+    draft?: boolean;
   };
 };
 
 type Props = {
   entries: Entry[];
-  basePath: "/projects" | "/photos" | "/music";
+  basePath: "/projects" | "/travel" | "/music";
   emptyText: string;
 };
 
@@ -32,7 +33,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
       {entries.map((entry) => (
         <li>
           <a href={`${basePath}/${entry.id}/`}>
-            <span>{entry.data.title}</span>
+            <span>{entry.data.title}{entry.data.draft && " (Draft)"}</span>
             <time datetime={entry.data.date.toISOString()}>
               {entry.data.primaryTag ?? dateFormatter.format(entry.data.date)}
             </time>
