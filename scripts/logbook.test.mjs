@@ -5,13 +5,13 @@ import { aircraftName, aircraftType, summarizeFlights, inferFlightDates } from "
 
 const logbook = JSON.parse(await readFile(new URL("../src/data/logbook.json", import.meta.url), "utf8"));
 
-test("imported flight totals reconcile with every final Google Sheet total", () => {
+test("flight entries reconcile with expected logbook totals", () => {
   const totals = summarizeFlights(logbook.entries);
-  for (const [key, expected] of Object.entries(logbook.sourceTotals)) {
+  for (const [key, expected] of Object.entries(logbook.expectedTotals)) {
     assert.equal(totals[key], expected, key);
   }
   assert.equal(totals.flights, 71);
-  assert.equal(totals.landings, 292);
+  assert.equal(totals.landings, 294);
   assert.ok(logbook.entries.every((entry) => entry.model && entry.date && entry.hours > 0));
 });
 

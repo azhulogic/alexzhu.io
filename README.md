@@ -31,7 +31,8 @@ No DNS changes or external hosting account are required.
 `src/data/logbook.json` is a read-only snapshot imported from the pilot logbook,
 not a live Google Sheets connection. Only complete flight rows contribute to
 totals; page subtotals and cumulative totals are excluded to avoid double counting.
-The imported totals are checked against the sheet's final totals by `npm test`.
+Flight totals are checked against the snapshot's `expectedTotals` by `npm test`.
+The snapshot includes owner-confirmed corrections to the imported entries.
 
 The owner confirmed a first flight in 2021 and chronological entry order.
 Month/day dates are assigned years from that starting point, advancing the year
