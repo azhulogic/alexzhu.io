@@ -1,6 +1,6 @@
 ---
 title: "San Diego"
-date: 2026-10-01
+date: 2026-10-02
 primaryTag: "Fall 2026"
 summary: ""
 tags: ["photos", "travel", "san diego", "california"]
