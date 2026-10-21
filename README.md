@@ -1,6 +1,8 @@
 # alexzhu.io
 Personal website built with Astro.
 
+Local Python experiments: see [the pendulum sandbox](simulations/pendulum/README.md).
+
 ## Development
 
 GitHub Pages deploys `main` to alexzhu.io. Work on `dev`, preview locally with
