@@ -168,14 +168,6 @@ a:focus-visible {
   width: min(100%, 24rem);
 }
 
-.entry-content img.photo-medium {
-  width: min(100%, 38rem);
-}
-
-.entry-content img.photo-wide {
-  width: min(100%, 52rem);
-}
-
 .entry-content video {
   width: min(100%, 38rem);
   height: auto;
@@ -186,26 +178,6 @@ a:focus-visible {
 
 .entry-content video.photo-small {
   width: min(100%, 24rem);
-}
-
-.entry-content video.photo-medium {
-  width: min(100%, 38rem);
-}
-
-.entry-content video.photo-wide {
-  width: min(100%, 52rem);
-}
-
-.demo-placeholder {
-  margin: 1.5rem 0;
-}
-
-.demo-placeholder canvas {
-  width: 100%;
-  height: auto;
-  display: block;
-  border: 1px solid #e6e6e6;
-  background: #fff;
 }
 
 .pendulum-demo {

@@ -1,24 +1,18 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import "katex/dist/katex.min.css";
 
 type Props = {
   title: string;
-  date: Date;
   primaryTag?: string;
   summary?: string;
   collectionPath: string;
 };
 
-const { title, date, primaryTag, summary, collectionPath } = Astro.props;
+const { title, primaryTag, summary, collectionPath } = Astro.props;
 const collection = collectionPath.split("/")[1];
 const collectionLabel = { projects: "Projects", travel: "Travel", music: "Music" }[collection];
 
-// const dateFormatter = new Intl.DateTimeFormat("en-US", {
-//   year: "numeric",
-//   month: "short",
-//   day: "numeric",
-//   timeZone: "UTC"
-// });
 ---
 
 <BaseLayout title={`${title} | alexzhu.io`} canonicalPath={collectionPath}>
@@ -32,7 +26,21 @@ const collectionLabel = { projects: "Projects", travel: "Travel", music: "Music"
       <span> / </span>
       {primaryTag}
     </p>
+    <hr class="entry-divider" />
     {summary && <p class="entry-summary">{summary}</p>}
     <slot />
   </main>
 </BaseLayout>
+
+<style>
+  .entry-divider {
+    border: 0;
+    border-top: 1px solid #e6e6e6;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .entry-content :global(.katex-display) {
+    overflow-x: auto;
+    padding-block: 0.25rem;
+  }
+</style>

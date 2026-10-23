@@ -1,5 +1,5 @@
 ---
-title: "[WIP] PID Control of an Inverted Pendulum"
+title: "PID Control of an Inverted Pendulum"
 date: 2026-06-10
 summary: ""
 primaryTag: "Guidance, Navigation & Control"
@@ -9,7 +9,91 @@ draft: false
 
 import InvertedPendulumFall from "../../components/InvertedPendulumFall.astro";
 
-This project will eventually build toward PID control of an inverted pendulum.
-For now a pendulum starts near upright and falls under gravity.
+
+A simple proportional, integral, derivative (PID) controller for the canonical inverted pendulum with linear actuation control. 
+
+I wrote this article to those who may not be familiar with control theory but have a basic understanding of calculus, enjoy!
 
 <InvertedPendulumFall />
+
+Above we have a pendulum that is allowed to freefall after starting in an arbitrary upright position. Suppose our goal is to *control* the system such that the pendulum stays upright without falling. 
+
+Our first task would be to find the mathematical equation(s) that tell us how this system moves, what forces it's under, what variables are relevant, etc. Perhaps we could call it...
+
+
+## The Equation of Motion
+An equation of motion describes the dynamics of a system; how it changes in time. In the
+pendulum's case, it describes how it swings, or its rotational motion. Rotational force
+is called *torque*.
+
+The equation of motion for the pendulum is simply,
+$$
+m\ell^2\ddot{\theta} = mg\ell\sin\theta - b\dot{\theta} - \tau
+$$
+
+I'll leave the derivation as an *exercise to the reader*, but more importantly here,
+- $m$ is the mass of the pendulum,
+- $g$ is acceleration due to gravity,
+- $l$ is the length of the pendulum's arm,
+- $\theta$ is the angle, measured clockwise-positive from the vertical, 
+- $b$ is the rotational damping coefficient, and 
+- $\tau$ is the applied torque.
+
+Each "dot" above a variable represents its derivative with respect to time.
+
+Notice that for the right-hand side of the equation, the first two terms are determined by physics, whereas the third -- the applied torque -- is what we will be able to control.
+
+$$
+\underbrace{mg\ell\sin\theta - b\dot{\theta}}_{physics} - \underbrace{\tau}_{controller}
+$$
+
+In essence, if we are able to manipulate $\tau$ such that the first two terms are cancelled out, the right hand side of the equation will drop to zero. How might we do that you ask...?
+
+## The Control Law
+
+A PID controller operates on three constants:
+- $K_p$ the *proportional* gain,
+- $K_i$ the *integral* gain,
+- $K_d$ the *derivative* gain.
+
+each has a slightly different purpose, but together they create the simple equation,
+
+$$
+u(t) = K_p e(t) + K_i \int e(t) + K_d \frac{d}{dt}e(t)
+$$
+
+Where $u(t)$ is the control output and $e(t)$ is the error.
+
+This may seem complicated, but may become more intuitive explained piecewise.
+
+## P: Current Error
+$$
+K_p e(t)
+$$
+The proportional term is, in my opinion, the most straightforward. In layman's terms it says: *"the further away I am from my target, the harder I should try to get there."* 
+
+Imagine you are driving down your highway and drifted slightly out of your lane, the proportional term tells you how aggressively to turn the steering wheel in response to that error.
+
+The larger your $K_p$, the greater the effort. Make it too large, and even a small error will cause a **huge** correction -- often leading to undesirable overshoot. You've swung your steering wheel all the way over when drifting out of your lane by only an inch... not ideal.
+
+## I: Accumulated Error
+$$
+K_i \int e(t)
+$$
+The integral term exists, in short, to reduce persistent errors over time that $K_p$ may not be able to eliminate on its own. This is called *steady-state error* and exists in many systems for a variety of reasons: hysteresis, sensor bias, static friction, to name a few. 
+
+Suppose your car is being struck by a constant crosswind. $K_p$ alone has succeeded in preventing you from drifting further, but still you remain *slightly* off-center in your lane. $K_i$ recognizes that and the longer you're off-center, the harder it will push to correct it. Once it centers you, it retains a non-zero value (some amount of steering) to steadily correct for the wind (assuming the wind is constant).
+
+Integral terms are susceptible to something called *integral windup*, where an actuator reaches its limit but error continues to accumulate. This is an important issue to be aware of, but solving it is outside our scope for now.
+
+## D: Changing Error
+$$
+K_d \frac{d}{dt}e(t)
+$$
+
+Finally, the derivative term at its highest level exists as a way to shape the response (in the form of damping). It says that if the error is growing very quickly, to respond more aggressively and vice versa. Notice that it actually becomes negative if error is shrinking, which is useful to avoid overshoot!
+
+Once more to the car analogy, if $K_p$ responds to how far you've drifted out of your lane; $K_d$ responds to the speed of that drifting. Drifting rapidly? Add more steering correction. Already heading back toward the center quickly? Ease off the wheel so you don't cross to the other side.
+
+
+*This article was written by hand, no AI!*

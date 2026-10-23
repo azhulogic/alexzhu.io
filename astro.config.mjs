@@ -1,9 +1,18 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 export default defineConfig({
   site: "https://alexzhu.io",
   integrations: [mdx()],
+  markdown: {
+    processor: unified({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [[rehypeKatex, { throwOnError: true }]]
+    })
+  },
   redirects: {
     "/photos/": "/travel/",
     "/photos/[slug]": "/travel/[slug]",
