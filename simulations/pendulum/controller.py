@@ -1,5 +1,3 @@
-"""YOUR CONTROLLER GOES HERE. No PID equations have been filled in."""
-
 from dataclasses import dataclass
 
 from .models import Parameters, State
