@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import "katex/dist/katex.min.css";
 
 type Props = {
   title: string;
@@ -25,7 +26,21 @@ const collectionLabel = { projects: "Projects", travel: "Travel", music: "Music"
       <span> / </span>
       {primaryTag}
     </p>
+    <hr class="entry-divider" />
     {summary && <p class="entry-summary">{summary}</p>}
     <slot />
   </main>
 </BaseLayout>
+
+<style>
+  .entry-divider {
+    border: 0;
+    border-top: 1px solid #e6e6e6;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .entry-content :global(.katex-display) {
+    overflow-x: auto;
+    padding-block: 0.25rem;
+  }
+</style>
