@@ -49,7 +49,6 @@ export function inferFlightDates(entries, firstYear, yearOverrides = {}) {
 export function summarizeFlights(entries) {
   const tenths = Object.fromEntries(logbookColumns.map(({ key }) => [key, 0]));
   const aircraft = new Map();
-  const tails = new Set();
   for (const entry of entries) {
     for (const { key } of logbookColumns) {
       const value = Number(entry[key] ?? 0);
@@ -61,13 +60,11 @@ export function summarizeFlights(entries) {
     group.tenths += Math.round(entry.hours * 10);
     group.flights += 1;
     aircraft.set(type, group);
-    if (entry.tail) tails.add(entry.tail);
   }
   return {
     ...Object.fromEntries(Object.entries(tenths).map(([key, value]) => [key, value / 10])),
     flights: entries.length,
     landings: (tenths.dayLandings + tenths.nightLandings) / 10,
-    tails: tails.size,
     aircraft: [...aircraft.values()].map(({ tenths, ...group }) => ({ ...group, hours: tenths / 10 }))
   };
 }

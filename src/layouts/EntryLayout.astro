@@ -3,22 +3,15 @@ import BaseLayout from "./BaseLayout.astro";
 
 type Props = {
   title: string;
-  date: Date;
   primaryTag?: string;
   summary?: string;
   collectionPath: string;
 };
 
-const { title, date, primaryTag, summary, collectionPath } = Astro.props;
+const { title, primaryTag, summary, collectionPath } = Astro.props;
 const collection = collectionPath.split("/")[1];
 const collectionLabel = { projects: "Projects", travel: "Travel", music: "Music" }[collection];
 
-// const dateFormatter = new Intl.DateTimeFormat("en-US", {
-//   year: "numeric",
-//   month: "short",
-//   day: "numeric",
-//   timeZone: "UTC"
-// });
 ---
 
 <BaseLayout title={`${title} | alexzhu.io`} canonicalPath={collectionPath}>

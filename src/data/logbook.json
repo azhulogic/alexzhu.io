@@ -4,10 +4,6 @@
   "yearOverrides": {
     "86": 2026
   },
-  "complete": false,
-  "notes": [
-    "Additional flight records may be added as they become available."
-  ],
   "expectedTotals": {
     "dayLandings": 280,
     "nightLandings": 14,
