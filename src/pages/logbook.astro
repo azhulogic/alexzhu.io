@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import LogbookLayout from "../layouts/LogbookLayout.astro";
 import logbook from "../data/logbook.json";
 import { aircraftName, aircraftType, inferFlightDates, logbookColumns, summarizeFlights } from "../lib/logbook.mjs";
 
@@ -42,11 +42,7 @@ const areaPath = `${linePath} L698,172 Z`;
 const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ key }) => flight[key as keyof typeof flight]);
 ---
 
-<BaseLayout title="Logbook | alexzhu.io" canonicalPath="/logbook/">
-  <main class="page-content logbook-page">
-    <header class="logbook-header">
-      <h1>Logbook</h1>
-    </header>
+<LogbookLayout active="flying">
 
     <section class="flight-summary" aria-label="Flight totals">
       <div class="total-hours">
@@ -145,8 +141,7 @@ const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ 
         <p>PIC = pilot in command; XC = cross-country; LDG = landings.</p>
       </div>
     </section>
-  </main>
-</BaseLayout>
+</LogbookLayout>
 
 <script>
   import { logbookColumns } from "../lib/logbook.mjs";
@@ -177,10 +172,7 @@ const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ 
 </script>
 
 <style>
-  .logbook-page { --ink-accent: #365b65; width: min(100%, 62rem); margin-top: 2.5rem; margin-bottom: 4rem; }
-  .logbook-header { margin-bottom: 2rem; }
-  .logbook-header h1 { font-size: clamp(2.25rem, 7vw, 3.25rem); letter-spacing: -0.045em; margin: 0 0 0.5rem; }
-  .flight-summary { display: grid; grid-template-columns: 1.5fr 1fr 1fr; align-items: center; gap: 2rem; padding: 2rem 0; border-block: 1px solid #dedede; }
+  .flight-summary { display: grid; grid-template-columns: 1.5fr 1fr 1fr; align-items: center; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid #dedede; }
   .stat-label { display: block; font-size: 0.8rem; color: var(--muted); }
   .hero-value { font-size: clamp(3.5rem, 9vw, 5rem); letter-spacing: -0.055em; line-height: 1.2; font-weight: 700; font-variant-numeric: tabular-nums; }
   .hero-value span { font-size: 1rem; margin-left: 0.6rem; font-weight: 400; letter-spacing: 0; color: var(--soft); }
@@ -217,18 +209,6 @@ const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ 
   .search-label { flex: 1; }
   .table-controls input, .table-controls select { width: 100%; border: 1px solid #dedede; background: transparent; color: var(--text); border-radius: 4px; font: inherit; font-size: 0.8rem; padding: 0.65rem 0.8rem; min-height: 2.5rem; }
   .table-controls input:focus-visible, .table-controls select:focus-visible, .table-scroll:focus-visible { outline: 2px solid var(--ink-accent); outline-offset: 3px; }
-  .table-scroll { overflow: auto; max-height: 32rem; border: 1px solid #dedede; border-radius: 4px; }
-  table { width: 100%; border-spacing: 0; font-size: 0.72rem; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: left; }
-  th, td { padding: 0.7rem 0.8rem; border-bottom: 1px solid #e8e8e8; border-right: 1px solid #ededed; }
-  thead th { position: sticky; top: 0; z-index: 2; background: #eef1f1; color: #4b595c; font-weight: 700; }
-  tbody th { position: sticky; left: 0; z-index: 1; background: var(--page-bg); font-weight: 400; }
-  tbody tr:nth-child(even) td, tbody tr:nth-child(even) th { background: #f3f5f5; }
-  tbody tr:hover td, tbody tr:hover th { background: #eaf0f1; }
-  thead th:first-child { left: 0; z-index: 3; }
-  tfoot th, tfoot td { position: sticky; bottom: 0; z-index: 2; background: #e7edee; border-bottom: 0; font-weight: 700; }
-  tfoot th { left: 0; z-index: 3; }
-  .numeric { text-align: right; }
-  .zero { color: #a1a7a8; }
   .record-notes { margin-top: 1rem; }
   .record-notes p { color: var(--soft); font-size: 0.7rem; line-height: 1.6; margin: 0.3rem 0; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -239,6 +219,5 @@ const tableValues = (flight: (typeof flights)[number]) => logbookColumns.map(({ 
     .aircraft-row { grid-template-columns: 6.5rem minmax(0, 1fr) max-content; gap: 0.8rem; }
     .aircraft-name strong { font-size: 0.8rem; }
     .table-controls { flex-direction: column; }
-    .logbook-page { margin-top: 1.5rem; }
   }
 </style>

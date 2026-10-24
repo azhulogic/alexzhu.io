@@ -10,7 +10,7 @@ const entries = (await getCollection("photos"))
 ---
 
 <BaseLayout title="Travel | alexzhu.io" canonicalPath="/travel/">
-  <main class="page-content">
+  <main class="page-content travel-page">
     <TravelGlobe />
     <section class="trips-section" aria-labelledby="trips-title">
       <h2 id="trips-title">Trips</h2>
@@ -22,6 +22,16 @@ const entries = (await getCollection("photos"))
 </BaseLayout>
 
 <style>
+  .travel-page {
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 35rem) {
+    .travel-page {
+      margin-top: -0.5rem;
+    }
+  }
+
   .trip-list-indent {
     padding-inline-start: 1.25rem;
   }

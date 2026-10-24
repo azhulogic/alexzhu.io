@@ -10,11 +10,11 @@ draft: false
 import InvertedPendulumFall from "../../components/InvertedPendulumFall.astro";
 
 
-A simple proportional, integral, derivative (PID) controller for the canonical inverted pendulum with linear actuation control. 
-
-I wrote this article to those who may not be familiar with control theory but have a basic understanding of calculus, enjoy!
+A simple proportional, integral, derivative (PID) controller for an inverted pendulum. 
 
 <InvertedPendulumFall />
+
+I wrote this article to those who may not be familiar with control theory but have a basic understanding of calculus, enjoy!
 
 Above we have a pendulum that is allowed to freefall after starting in an arbitrary upright position. Suppose our goal is to *control* the system such that the pendulum stays upright without falling. 
 
@@ -23,7 +23,7 @@ Our first task would be to find the mathematical equation(s) that tell us how th
 
 ## The Equation of Motion
 An equation of motion describes the dynamics of a system; how it changes in time. In the
-pendulum's case, it describes how it swings, or its rotational motion. Rotational force
+pendulum's case, it describes how it swings, or its angular motion. Angular force
 is called *torque*.
 
 The equation of motion for the pendulum is simply,
@@ -41,13 +41,17 @@ I'll leave the derivation as an *exercise to the reader*, but more importantly h
 
 Each "dot" above a variable represents its derivative with respect to time.
 
-Notice that for the right-hand side of the equation, the first two terms are determined by physics, whereas the third -- the applied torque -- is what we will be able to control.
+Notice that for the right-hand side of the equation, the first two terms are determined by physics, whereas the third -- the applied torque, is what we will be able to control.
 
 $$
 \underbrace{mg\ell\sin\theta - b\dot{\theta}}_{physics} - \underbrace{\tau}_{controller}
 $$
 
-In essence, if we are able to manipulate $\tau$ such that the first two terms are cancelled out, the right hand side of the equation will drop to zero. How might we do that you ask...?
+The goal therefore, is to drive our angular position $\theta$ to zero by applying $\tau$ such that angular velocity $\dot\theta$ pushes the pendulum upright, which itself is driven by angular acceleration $\ddot\theta$. 
+
+$$
+\tau = mlu\sin\theta
+$$
 
 ## The Control Law
 
@@ -63,6 +67,9 @@ u(t) = K_p e(t) + K_i \int e(t) + K_d \frac{d}{dt}e(t)
 $$
 
 Where $u(t)$ is the control output and $e(t)$ is the error.
+$$
+e(t)=\theta'-\theta
+$$
 
 This may seem complicated, but may become more intuitive explained piecewise.
 
@@ -72,7 +79,7 @@ K_p e(t)
 $$
 The proportional term is, in my opinion, the most straightforward. In layman's terms it says: *"the further away I am from my target, the harder I should try to get there."* 
 
-Imagine you are driving down your highway and drifted slightly out of your lane, the proportional term tells you how aggressively to turn the steering wheel in response to that error.
+Imagine you are driving down the highway and drifted slightly out of your lane, the proportional term tells you how aggressively to turn the steering wheel in response to that error.
 
 The larger your $K_p$, the greater the effort. Make it too large, and even a small error will cause a **huge** correction -- often leading to undesirable overshoot. You've swung your steering wheel all the way over when drifting out of your lane by only an inch... not ideal.
 
@@ -82,9 +89,11 @@ K_i \int e(t)
 $$
 The integral term exists, in short, to reduce persistent errors over time that $K_p$ may not be able to eliminate on its own. This is called *steady-state error* and exists in many systems for a variety of reasons: hysteresis, sensor bias, static friction, to name a few. 
 
-Suppose your car is being struck by a constant crosswind. $K_p$ alone has succeeded in preventing you from drifting further, but still you remain *slightly* off-center in your lane. $K_i$ recognizes that and the longer you're off-center, the harder it will push to correct it. Once it centers you, it retains a non-zero value (some amount of steering) to steadily correct for the wind (assuming the wind is constant).
+Suppose now your car is being struck by a constant crosswind. $K_p$ alone has succeeded in preventing you from drifting further, but still you remain *slightly* off-center in your lane. $K_i$ notices the error and slowly turns your wheel towards the center, the longer the error persists, the more it will push to correct it. Once it centers you, it retains that non-zero amount of control (steering) to steadily correct for the constant wind.
 
 Integral terms are susceptible to something called *integral windup*, where an actuator reaches its limit but error continues to accumulate. This is an important issue to be aware of, but solving it is outside our scope for now.
+
+*Note: an idealized pendulum as seen above likely wouldn't need an integral term, as the system is naturally unstable outside of its equilibrium point.*
 
 ## D: Changing Error
 $$
