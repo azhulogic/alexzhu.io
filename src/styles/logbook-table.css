@@ -1,0 +1,13 @@
+.logbook-page .table-scroll { overflow: auto; max-height: 32rem; border: 1px solid #dedede; border-radius: 4px; }
+.logbook-page table { width: 100%; border-spacing: 0; font-size: 0.72rem; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: left; }
+.logbook-page th, .logbook-page td { padding: 0.7rem 0.8rem; border-bottom: 1px solid #e8e8e8; border-right: 1px solid #ededed; }
+.logbook-page thead th { position: sticky; top: 0; z-index: 2; background: #eef1f1; color: #4b595c; font-weight: 700; }
+.logbook-page tbody th { position: sticky; left: 0; z-index: 1; background: var(--page-bg); font-weight: 400; }
+.logbook-page tbody tr:nth-child(even) td, .logbook-page tbody tr:nth-child(even) th { background: #f3f5f5; }
+.logbook-page tbody tr:hover td, .logbook-page tbody tr:hover th { background: #eaf0f1; }
+.logbook-page thead th:first-child { left: 0; z-index: 3; }
+.logbook-page tfoot th, .logbook-page tfoot td { position: sticky; bottom: 0; z-index: 2; background: #e7edee; border-bottom: 0; font-weight: 700; }
+.logbook-page tfoot th { left: 0; z-index: 3; }
+.logbook-page .numeric { text-align: right; }
+.logbook-page .zero { color: #a1a7a8; }
+.logbook-page .table-scroll:focus-visible { outline: 2px solid var(--ink-accent); outline-offset: 3px; }

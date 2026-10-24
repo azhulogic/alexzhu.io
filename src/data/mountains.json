@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Black Elk Peak",
+    "status": "Tentative",
+    "location": "South Dakota, USA",
+    "elevationFt": 7242,
+    "sourceUrl": "https://gfp.sd.gov/userdocs/docs/Black_Elk_Peak.pdf"
+  },
+  {
+    "name": "Humphreys Peak",
+    "status": "Tentative",
+    "location": "Arizona, USA",
+    "elevationFt": 12633,
+    "sourceUrl": "https://www.usgs.gov/media/images/sunset-crater-humphreys-peak"
+  },
+  {
+    "name": "Mount Langley",
+    "status": "Tentative",
+    "location": "California, USA",
+    "elevationFt": 14026,
+    "sourceUrl": "https://www.usgs.gov/educational-resources/elevations-named-summits-over-14000-feet-above-sea-level"
+  },
+  {
+    "name": "Mount Massive",
+    "status": "Tentative",
+    "location": "Colorado, USA",
+    "elevationFt": 14428,
+    "sourceUrl": "https://trails.colorado.gov/routes/20"
+  },
+  {
+    "name": "Mount Elbert",
+    "status": "Tentative",
+    "location": "Colorado, USA",
+    "elevationFt": 14440,
+    "sourceUrl": "https://d9-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/s3fs-public/media/files/Review%20List%20453.pdf"
+  },
+  {
+    "name": "Quandary Peak",
+    "status": "Tentative",
+    "location": "Colorado, USA",
+    "elevationFt": 14265,
+    "sourceUrl": "https://www.fs.usda.gov/sites/default/files/CH-CD-NM-FAQ.pdf"
+  },
+  {
+    "name": "Guadalupe Peak",
+    "status": "Tentative",
+    "location": "Texas, USA",
+    "elevationFt": 8751,
+    "sourceUrl": "https://www.nps.gov/places/gumo_guadalupe_peak.htm"
+  },
+  {
+    "name": "Emory Peak",
+    "status": "Tentative",
+    "location": "Texas, USA",
+    "elevationFt": 7832,
+    "sourceUrl": "https://www.nps.gov/bibe/learn/management/statistics.htm"
+  },
+  {
+    "name": "Mount Rainier*",
+    "status": "Tentative",
+    "location": "Washington, USA",
+    "elevationFt": 14410,
+    "sourceUrl": "https://www.usgs.gov/volcanoes/mount-rainier"
+  },
+  {
+    "name": "Mount Washington",
+    "status": "Tentative",
+    "location": "Washington, USA",
+    "elevationFt": 6260,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Mount_Washington_(Olympics)"
+  },
+  {
+    "name": "Old Rag",
+    "status": "Tentative",
+    "location": "Virginia, USA",
+    "elevationFt": 3284,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Old_Rag_Mountain"
+  },
+  {
+    "name": "Longs Peak",
+    "status": "Tentative",
+    "location": "Colorado, USA",
+    "elevationFt": 14259,
+    "sourceUrl": "https://www.nps.gov/romo/learn/management/statistics.htm"
+  }
+]
