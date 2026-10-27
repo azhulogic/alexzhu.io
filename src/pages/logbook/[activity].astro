@@ -3,19 +3,38 @@ import LogbookLayout from "../../layouts/LogbookLayout.astro";
 import mountains from "../../data/mountains.json";
 
 export function getStaticPaths() {
+  const seasons: Record<string, number> = { Winter: 0, Spring: 1, Summer: 2, Fall: 3, Autumn: 3 };
+  const chronologicalMountains = [...mountains].sort((a, b) =>
+    b.year - a.year || (seasons[b.season] ?? -1) - (seasons[a.season] ?? -1)
+      || ("seasonOrder" in b ? Number(b.seasonOrder) : 0) - ("seasonOrder" in a ? Number(a.seasonOrder) : 0)
+  );
+  const summited = mountains.filter((mountain) => mountain.status === "Summited");
+  const routeGain = summited.reduce((total, mountain) => total + mountain.routeElevationGainFt, 0);
+  const highest = Math.max(...summited.map((mountain) => mountain.elevationFt));
   return [
     { params: { activity: "mountains" }, props: {
       active: "mountains" as const,
-      stats: ["Summits", "Highest summit", "Elevation gained"],
+      stats: [
+        { label: "Summits", value: String(summited.length), unit: "", detail: `${mountains.length} attempts` },
+        { label: "Highest summit", value: highest.toLocaleString("en-US"), unit: "ft", detail: "" },
+        { label: "Total feet climbed", value: `~${routeGain.toLocaleString("en-US")}`, unit: "ft", detail: "" }
+      ],
       heading: "Summit records",
-      columns: ["Date", "Mountain", "Location", "Summit elevation (ft)", "Elevation gain", "Route", "Notes"],
-      rows: mountains.map((mountain) => [mountain.date, mountain.name, mountain.location, mountain.elevationFt.toLocaleString("en-US"), "?", "?", mountain.status]),
+      failedAttempts: chronologicalMountains.map((mountain) => mountain.status === "Failed summit"),
+      columns: ["Date", "Mountain", "Location", "Summit elevation (ft)", "Elevation gain (ft)", "Distance RT (mi)", "Route", "Notes"],
+      rows: chronologicalMountains.map((mountain) => [
+        "year" in mountain ? `${"season" in mountain ? `${mountain.season} ` : ""}${mountain.year}` : "—", mountain.name, mountain.location,
+        mountain.elevationFt.toLocaleString("en-US"), mountain.routeElevationGainFt.toLocaleString("en-US"),
+        mountain.routeDistanceMiles.toLocaleString("en-US"), mountain.route,
+        mountain.notes ?? "—"
+      ]),
       emptyText: "Mountains climbed and summit notes will appear here."
     } },
     { params: { activity: "diving" }, props: {
       active: "diving" as const,
-      stats: ["Dives", "Time underwater", "Deepest dive"],
+      stats: ["Dives", "Time underwater", "Deepest dive"].map((label) => ({ label, value: "—", unit: "", detail: "" })),
       heading: "Dive records",
+      failedAttempts: [] as boolean[],
       columns: ["Date", "Dive site", "Location", "Max depth", "Duration", "Notes"],
       rows: [] as string[][],
       emptyText: "Scuba dives and underwater notes will appear here."
@@ -23,13 +42,20 @@ export function getStaticPaths() {
   ];
 }
 
-const { active, stats, heading, columns, rows, emptyText } = Astro.props;
+const { active, stats, heading, columns, rows, emptyText, failedAttempts } = Astro.props;
+const isNumericColumn = (index: number) => index === 3 || index === 4 || (active === "mountains" && index === 5);
 ---
 
 <LogbookLayout active={active}>
   <section class="activity-summary" aria-label={active === "mountains" ? "Climbing totals" : "Diving totals"}>
-    {stats.map((label: string) => (
-      <div><span>{label}</span><strong aria-label="Not yet recorded">—</strong></div>
+    {stats.map((stat, index) => (
+      <div class:list={[{ "primary-stat": index === 0 }]}>
+        <span class="stat-label">{stat.label}</span>
+        <strong class:list={[{ pending: stat.value === "—" }]} aria-label={stat.value === "—" ? "Not yet recorded" : undefined}>
+          {stat.value}{stat.unit && <small>{stat.unit}</small>}
+        </strong>
+        {stat.detail && <span class="stat-detail">{stat.detail}</span>}
+      </div>
     ))}
   </section>
 
@@ -38,23 +64,38 @@ const { active, stats, heading, columns, rows, emptyText } = Astro.props;
     <div class="table-scroll" tabindex="0" role="region" aria-label={`${heading}; scroll horizontally for all columns`}>
       <table>
         <caption class="sr-only">{heading}</caption>
-        <thead><tr>{columns.map((label: string, index: number) => <th scope="col" class:list={[{ numeric: index === 3 || index === 4 }]}>{label}</th>)}</tr></thead>
+        <thead><tr>{columns.map((label: string, index: number) => <th scope="col" class:list={[{ numeric: isNumericColumn(index) }]}>{label}</th>)}</tr></thead>
         <tbody>
-          {rows.length > 0 ? rows.map((row: string[]) => (
-            <tr>{row.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td class:list={[{ numeric: index === 3 || index === 4 }]}>{cell}</td>)}</tr>
+          {rows.length > 0 ? rows.map((row: string[], rowIndex: number) => (
+            <tr>{row.map((cell, index) => index === 0 ? <th scope="row">{cell}</th> : <td class:list={[{ numeric: isNumericColumn(index) }]}>
+              {active === "mountains" && index === 1 && failedAttempts[rowIndex]
+                ? <em aria-describedby="summit-caveat">{cell}<sup>*</sup></em>
+                : cell}
+            </td>)}</tr>
           )) : <tr><td colspan={columns.length} class="empty-records">{emptyText}</td></tr>}
         </tbody>
       </table>
     </div>
+    {active === "mountains" && failedAttempts.some(Boolean) && <p id="summit-caveat" class="record-note">* Summit not reached.</p>}
   </section>
 </LogbookLayout>
 
 <style>
-  .activity-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; padding: 1.5rem 0 2rem; border-bottom: 1px solid #dedede; }
-  .activity-summary span { display: block; font-size: 0.8rem; color: var(--muted); }
-  .activity-summary strong { display: block; margin-top: 0.5rem; font-size: clamp(2rem, 6vw, 3rem); font-weight: 400; color: var(--soft); }
+  .activity-summary { display: grid; grid-template-columns: 1.5fr 1fr 1fr; align-items: center; gap: 2rem; padding: 2rem 0; border-bottom: 1px solid #dedede; }
+  .stat-label { display: block; font-size: 0.8rem; color: var(--muted); }
+  .stat-detail { display: block; margin-top: 0.5rem; font-size: 0.7rem; line-height: 1.5; color: var(--soft); }
+  .activity-summary strong { display: block; margin: 0.5rem 0; font-size: 2.25rem; font-weight: 700; letter-spacing: -0.035em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .activity-summary .primary-stat strong { margin-top: 0; font-size: clamp(3.5rem, 9vw, 5rem); letter-spacing: -0.055em; line-height: 1.2; }
+  .activity-summary strong.pending { font-weight: 400; color: var(--soft); }
+  .activity-summary small { margin-left: 0.35rem; font-size: 0.8rem; font-weight: 400; letter-spacing: 0; color: var(--soft); }
+  @media (max-width: 40rem) {
+    .activity-summary strong { font-size: 2rem; }
+    .activity-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+    .activity-summary > div:first-child { grid-column: 1 / -1; }
+  }
   .activity-records { margin-top: 3rem; }
   .activity-records h2 { margin: 0 0 1.25rem; font-size: 1.125rem; letter-spacing: -0.02em; }
   .empty-records { padding: 2.5rem 1rem; text-align: center; color: var(--soft); line-height: 1.6; }
+  .activity-records .record-note { margin: 0.75rem 0 0; font-size: 0.7rem; color: var(--soft); }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 </style>
